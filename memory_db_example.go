@@ -15,7 +15,7 @@ func ifErrorPanic(err error) {
 	}
 }
 
-func main() {
+func main2() {
 	// Initialize default Badger options
 	var badgerOptions badger.Options = badger.DefaultOptions("")
 	// Set in-memory storage for Badger

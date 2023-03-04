@@ -2,13 +2,12 @@
     "profiles": {
         "example-profile": {
             "name": "Example - targets all confidence checks on the ruleset",
-            "storage": "memory",
             "description": "Targets all confidence checks on the ruleset, high or low, for all available platforms. This is the heaviest possible scan. It is stored in memory, so beware, it will potentially be heavy on RAM usage.",
             "confidence": [
                 "high",
                 "low"
             ],
-            "titles": [
+            "ruleset": [
 
             ]
         }
