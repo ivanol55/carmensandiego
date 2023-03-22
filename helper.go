@@ -25,7 +25,7 @@ func main() {
 	case "scan":
 		// Check if the required amount of arguments were sent. If not, show an error to the user and exit the program
 		requiredArgCount.CheckForArgs(os.Args, 3, "scan")
-		setupScan.SetupScan()
+		setupScan.SetupScan(os.Args[2])
 	// If the first argument doesn't match any supported arguments, show the general application help and exit the program
 	default:
 		generalHelp.ShowHelp()

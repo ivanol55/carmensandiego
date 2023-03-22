@@ -23,14 +23,5 @@ func ShowGreeting() {
 	fmt.Println(" ###############################################################################")
 	fmt.Println(" ###############################################################################")
 	fmt.Println("")
-	fmt.Println("Welcome to CarmenSandieggo! this is a helper tool used to find secrets embedded in code as quickly as possible!")
+	fmt.Println("Welcome to CarmenSandiego! this is a helper tool used to find secrets embedded in code as quickly as possible!")
 }
-
-
-
-
-
-
-
-
-

@@ -9,7 +9,11 @@
             ],
             "ruleset": [
 
-            ]
+            ],
+            "exemptions": [
+
+            ],
+            "threads": 8
         }
     }
 }
