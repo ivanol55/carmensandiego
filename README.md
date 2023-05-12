@@ -30,4 +30,4 @@ docker run --rm \
 ```
 
 # Where can I send the detected findings?
-The standard format provided by `carmensandiego` can be sent to anything that then supports the data processing a standard `json` file.
+For now, `carmensandiego` doesn't support any integrations, it's for pure user-interaction only. That might change in the future 👀
