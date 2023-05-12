@@ -11,7 +11,7 @@ RUN go install
 RUN go build helper.go
 
 # Remove .git files to avoid repository disclosure
-RUN rm -rf src/ .git .gitignore README.md docker-compose.yaml Dockerfile  go.mod go.sum LICENSE
+RUN rm -rf src/golang/ .git .gitignore README.md docker-compose.yaml Dockerfile  go.mod go.sum LICENSE
 
 # Switch to Alpine image as a final base
 FROM alpine:3.18.0 AS helper

@@ -18,14 +18,14 @@ The aim of this tool is to bring in the human-centric part we miss from other to
 # How does this work?
 This CLI tool is built entirely as a Go binary, with all its dependencies built inside a Docker image with the provided `Dockerfile`. The image uses the `helper` built binary as an entrypoint, so just build it:
 ```
-docker build -t carmensandiego
+docker build -t carmensandiego -f Dockerfile .
 ```
 
 modify your desired profile in `config.json`, and run the container with the desired task and profile:
 ```
 docker run --rm \
-    -v ./config.json:/carmensandiego/config.json \
-    -v ./scans:/carmensandiego/scans \
+    -v $(pwd)/config.json:/carmensandiego/config.json \
+    -v $(pwd)/target:/carmensandiego/target \
     carmensandiego:latest scan example-profile
 ```
 

@@ -4,9 +4,11 @@ package scannerRunner
 // Imports necessary packages for the main logic loop to run the necessary helpers and tools based on script arguments
 import (
 	"carmensandiego/src/golang/functions/helpers/configManagement"
+	"carmensandiego/src/golang/functions/helpers/databaseManagement"
+	"carmensandiego/src/golang/functions/helpers/errorManagement"
 	"carmensandiego/src/golang/functions/helpers/threadManagement"
-	"carmensandiego/src/golang/functions/secrets/databaseManagement"
 	"fmt"
+	"regexp"
 	"sync"
 
 	"github.com/dgraph-io/badger/v3"
@@ -23,7 +25,9 @@ func RunScan(profileName string, initializedDatabases []*badger.DB) {
 	resultsDatabase = initializedDatabases[2]
 	// Get regex rules based on the profile filtering
 	var regexDictionary []databaseManagement.KeyValueEntry
+	fmt.Println("Fetching the desired regex rules...")
 	regexDictionary = getChosenRegexRules(profileName, patternsDatabase)
+	fmt.Println("Scanning the files for secrets...")
 	scanDatabaseFiles(profileName, regexDictionary, filesDatabase, resultsDatabase)
 	showResults(resultsDatabase)
 }
@@ -77,16 +81,38 @@ func scanFilesForSecrets(secretScanningWaitGroup *sync.WaitGroup, queue []string
 	defer secretScanningWaitGroup.Done()
 	var filenameToScan string
 	var fileContents []byte
+	var regexEntry databaseManagement.KeyValueEntry
+	var regexpObject *regexp.Regexp
+	var matchedStrings [][]byte
+	var matchedStringsEntry []byte
+	var resultingScanField string
+	var err error
 	for _, filenameToScan = range queue {
-		fmt.Println("scanning file: " + filenameToScan)
 		fileContents = databaseManagement.ReadEntry(filesDatabase, filenameToScan)
 		for _, regexEntry = range regexDictionary {
-
+			regexpObject, err = regexp.Compile(regexEntry.Value)
+			errorManagement.CheckError(err)
+			matchedStrings = regexpObject.FindAll(fileContents, -1)
+			if matchedStrings != nil {
+				resultingScanField = "Matched the file \"" + filenameToScan + "\" with rule \"" + regexEntry.Key + "\" for the following strings:\n"
+				for _, matchedStringsEntry = range matchedStrings {
+					resultingScanField = resultingScanField + "\t" + string(matchedStringsEntry) + "\n"
+				}
+				databaseManagement.WriteEntry(resultsDatabase, filenameToScan+regexEntry.Key, resultingScanField)
+			}
 		}
-		fmt.Println(string(fileContents))
 	}
 }
 
 func showResults(resultsDatabase *badger.DB) {
-	fmt.Println("scan done")
+	var scanResults []databaseManagement.KeyValueEntry
+	var scanResult databaseManagement.KeyValueEntry
+	scanResults = databaseManagement.FetchAllKeysAndValues(resultsDatabase)
+	if len(scanResults) == 0 {
+		fmt.Println("No secrets found")
+	} else {
+		for _, scanResult = range scanResults {
+			fmt.Println(scanResult.Value)
+		}
+	}
 }

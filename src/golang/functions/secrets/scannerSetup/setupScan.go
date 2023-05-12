@@ -4,9 +4,9 @@ package scannerSetup
 // Imports necessary packages for the main logic loop to run the necessary helpers and tools based on script arguments
 import (
 	"carmensandiego/src/golang/functions/helpers/configManagement"
+	"carmensandiego/src/golang/functions/helpers/databaseManagement"
 	"carmensandiego/src/golang/functions/helpers/errorManagement"
 	"carmensandiego/src/golang/functions/helpers/threadManagement"
-	"carmensandiego/src/golang/functions/secrets/databaseManagement"
 	"encoding/json"
 	"fmt"
 	"io/fs"
@@ -29,9 +29,11 @@ func SetupScan(profileName string) []*badger.DB {
 	patternsDatabase = databaseManagement.InitializeDatabase()
 	filesDatabase = databaseManagement.InitializeDatabase()
 	resultsDatabase = databaseManagement.InitializeDatabase()
-	fmt.Println("Populating databases...")
+
 	// Populate our databases with the necessary data
+	fmt.Println("Populating patterns database...")
 	populatePatternsDatabase(patternsDatabase)
+	fmt.Println("Populating files database...")
 	populateFilesDatabase(filesDatabase, profileName)
 	fmt.Println("Clearing exemptions from the files database...")
 	// Clear exemptions we set on our profile from

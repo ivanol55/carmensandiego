@@ -1,1 +1,5 @@
 helper
+target/*
+!target/.gitkeep
+!target/no-secrets.txt
+!target/fake-detectable-secrets.txt
