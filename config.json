@@ -8,12 +8,12 @@
                 "low"
             ],
             "ruleset": [
-
+                "all"
             ],
             "exemptions": [
 
             ],
-            "threads": 8
+            "threads": 16
         }
     }
 }

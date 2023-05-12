@@ -1,10 +1,11 @@
 // Sets the package name for the main script
-package setupScan
+package scannerSetup
 
 // Imports necessary packages for the main logic loop to run the necessary helpers and tools based on script arguments
 import (
 	"carmensandiego/src/golang/functions/helpers/configManagement"
 	"carmensandiego/src/golang/functions/helpers/errorManagement"
+	"carmensandiego/src/golang/functions/helpers/threadManagement"
 	"carmensandiego/src/golang/functions/secrets/databaseManagement"
 	"encoding/json"
 	"fmt"
@@ -12,7 +13,6 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
-	"runtime"
 	"strings"
 	"sync"
 
@@ -74,7 +74,9 @@ func populatePatternsDatabase(patternsDatabase *badger.DB) {
 }
 
 func populateFilesDatabase(filesDatabase *badger.DB, profileName string) {
+	var threads int
 	var profile configManagement.Profile
+	threads = profile.Threads
 	profile = configManagement.GetProfile(profileName)
 	// Read the list of all the files we would like to scan
 	var err error = nil
@@ -85,13 +87,9 @@ func populateFilesDatabase(filesDatabase *badger.DB, profileName string) {
 	errorManagement.CheckError(err)
 	// Prepare as many queues as we have routine threads for the profile
 	var queues [][]string
-	var threads int
-	threads = profile.Threads
-	queues = generateQueues(threads)
+	queues = threadManagement.GenerateQueues()
 	// Separate all files into the queues
-	queues = populateQueues(fileList, queues, threads)
-	// Set potential goroutine processes to the number of threads we selected
-	runtime.GOMAXPROCS(threads)
+	queues = threadManagement.PopulateQueues(fileList, queues)
 	// Read file contents into the database as threads to speed up the process
 	var filePopulationWaitGroup sync.WaitGroup
 	filePopulationWaitGroup.Add(threads)
@@ -121,35 +119,6 @@ func getFileList(dir string, fileList *[]string) error {
 		}
 	}
 	return nil
-}
-
-func generateQueues(threads int) [][]string {
-	// Generate queues for the nomber of goroutine threads we're running, and return the queue set
-	var queueSet [][]string
-	var queue []string
-	var thread int
-	for thread = 1; thread <= threads; thread = thread + 1 {
-		queue = []string{}
-		queueSet = append(queueSet, queue)
-	}
-	return queueSet
-}
-
-func populateQueues(fileList []string, queues [][]string, threads int) [][]string {
-	// For each goroutine thread, populate these queues with an equal amount of files to scan
-	var thread int
-	thread = 0
-	threads = threads - 1
-	var file string
-	for _, file = range fileList {
-		queues[thread] = append(queues[thread], file)
-		if thread == threads {
-			thread = 0
-		} else {
-			thread = thread + 1
-		}
-	}
-	return queues
 }
 
 func readFilesToDatabase(filePopulationWaitGroup *sync.WaitGroup, fileQueue []string, filesDatabase *badger.DB) {

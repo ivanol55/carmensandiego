@@ -6,8 +6,11 @@ import (
 	"carmensandiego/src/golang/functions/helpers/generalHelp"
 	"carmensandiego/src/golang/functions/helpers/greeting"
 	"carmensandiego/src/golang/functions/helpers/requiredArgCount"
-	"carmensandiego/src/golang/functions/secrets/setupScan"
+	scannerRunner "carmensandiego/src/golang/functions/secrets/scannerRunner"
+	scannerSetup "carmensandiego/src/golang/functions/secrets/scannerSetup"
 	"os"
+
+	"github.com/dgraph-io/badger/v3"
 )
 
 // Function that runs when the program is started, executes the main application logic
@@ -25,7 +28,9 @@ func main() {
 	case "scan":
 		// Check if the required amount of arguments were sent. If not, show an error to the user and exit the program
 		requiredArgCount.CheckForArgs(os.Args, 3, "scan")
-		setupScan.SetupScan(os.Args[2])
+		var initializedDatabases []*badger.DB
+		initializedDatabases = scannerSetup.SetupScan(os.Args[2])
+		scannerRunner.RunScan(os.Args[2], initializedDatabases)
 	// If the first argument doesn't match any supported arguments, show the general application help and exit the program
 	default:
 		generalHelp.ShowHelp()
