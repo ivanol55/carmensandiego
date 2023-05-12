@@ -8,9 +8,10 @@ import (
 
 // Imports necessary packages for the function to prepare threads as necessary, needed in multiple parts of the code to enable multithreading
 
-func GenerateQueues() [][]string {
+func GenerateQueues(profileName string) [][]string {
 	var profile configManagement.Profile
 	var threads int
+	profile = configManagement.GetProfile(profileName)
 	threads = profile.Threads
 	if threads < 2 {
 		threads = 2
@@ -27,10 +28,11 @@ func GenerateQueues() [][]string {
 	return queueSet
 }
 
-func PopulateQueues(fileList []string, queues [][]string) [][]string {
+func PopulateQueues(profileName string, fileList []string, queues [][]string) [][]string {
 	// For each goroutine thread, populate these queues with an equal amount of files to scan
 	var profile configManagement.Profile
 	var threads int
+	profile = configManagement.GetProfile(profileName)
 	threads = profile.Threads
 	var thread int
 	thread = 0

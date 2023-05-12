@@ -24,7 +24,8 @@ func RunScan(profileName string, initializedDatabases []*badger.DB) {
 	// Get regex rules based on the profile filtering
 	var regexDictionary []databaseManagement.KeyValueEntry
 	regexDictionary = getChosenRegexRules(profileName, patternsDatabase)
-	scanDatabaseFiles(regexDictionary, filesDatabase, resultsDatabase)
+	scanDatabaseFiles(profileName, regexDictionary, filesDatabase, resultsDatabase)
+	showResults(resultsDatabase)
 }
 
 func getChosenRegexRules(profileName string, patternsDatabase *badger.DB) []databaseManagement.KeyValueEntry {
@@ -49,18 +50,18 @@ func getChosenRegexRules(profileName string, patternsDatabase *badger.DB) []data
 	return regexDBEntries
 }
 
-func scanDatabaseFiles(regexDictionary []databaseManagement.KeyValueEntry, filesDatabase *badger.DB, resultsDatabase *badger.DB) {
+func scanDatabaseFiles(profileName string, regexDictionary []databaseManagement.KeyValueEntry, filesDatabase *badger.DB, resultsDatabase *badger.DB) {
 	// Prepare as many queues as we have routine threads for the profile
 	var queues [][]string
 	var profile configManagement.Profile
 	var threads int
+	profile = configManagement.GetProfile(profileName)
 	threads = profile.Threads
-	queues = threadManagement.GenerateQueues()
+	queues = threadManagement.GenerateQueues(profileName)
 	// Separate all targets into the queues
 	var fileList []string
 	fileList = databaseManagement.FetchAllKeys(filesDatabase)
-	queues = threadManagement.PopulateQueues(fileList, queues)
-	fmt.Println(queues)
+	queues = threadManagement.PopulateQueues(profileName, fileList, queues)
 	// Run the scan as a parallel task per queue
 	var secretScanningWaitGroup sync.WaitGroup
 	secretScanningWaitGroup.Add(threads)
@@ -71,13 +72,21 @@ func scanDatabaseFiles(regexDictionary []databaseManagement.KeyValueEntry, files
 	secretScanningWaitGroup.Wait()
 }
 
+// Helper multithreaded function for scanDatabaseFiles to run a scan for each queue
 func scanFilesForSecrets(secretScanningWaitGroup *sync.WaitGroup, queue []string, filesDatabase *badger.DB, regexDictionary []databaseManagement.KeyValueEntry, resultsDatabase *badger.DB) {
+	defer secretScanningWaitGroup.Done()
 	var filenameToScan string
+	var fileContents []byte
 	for _, filenameToScan = range queue {
-		fmt.Println(filenameToScan)
+		fmt.Println("scanning file: " + filenameToScan)
+		fileContents = databaseManagement.ReadEntry(filesDatabase, filenameToScan)
+		for _, regexEntry = range regexDictionary {
+
+		}
+		fmt.Println(string(fileContents))
 	}
 }
 
 func showResults(resultsDatabase *badger.DB) {
-
+	fmt.Println("scan done")
 }

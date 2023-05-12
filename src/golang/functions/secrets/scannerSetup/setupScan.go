@@ -74,10 +74,10 @@ func populatePatternsDatabase(patternsDatabase *badger.DB) {
 }
 
 func populateFilesDatabase(filesDatabase *badger.DB, profileName string) {
-	var threads int
 	var profile configManagement.Profile
-	threads = profile.Threads
+	var threads int
 	profile = configManagement.GetProfile(profileName)
+	threads = profile.Threads
 	// Read the list of all the files we would like to scan
 	var err error = nil
 	var baseDir string
@@ -87,9 +87,9 @@ func populateFilesDatabase(filesDatabase *badger.DB, profileName string) {
 	errorManagement.CheckError(err)
 	// Prepare as many queues as we have routine threads for the profile
 	var queues [][]string
-	queues = threadManagement.GenerateQueues()
+	queues = threadManagement.GenerateQueues(profileName)
 	// Separate all files into the queues
-	queues = threadManagement.PopulateQueues(fileList, queues)
+	queues = threadManagement.PopulateQueues(profileName, fileList, queues)
 	// Read file contents into the database as threads to speed up the process
 	var filePopulationWaitGroup sync.WaitGroup
 	filePopulationWaitGroup.Add(threads)
@@ -131,7 +131,7 @@ func readFilesToDatabase(filePopulationWaitGroup *sync.WaitGroup, fileQueue []st
 	for _, file = range fileQueue {
 		fileContents, err = ioutil.ReadFile(file)
 		fileContentsString = string(fileContents)
-		file = strings.TrimLeft(file, "target/")
+		file = strings.TrimPrefix(file, "target/")
 		databaseManagement.WriteEntry(filesDatabase, file, fileContentsString)
 		errorManagement.CheckError(err)
 	}
