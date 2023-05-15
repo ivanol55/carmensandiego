@@ -1,11 +1,11 @@
 # What is carmensandiego?
-`carmensandiego` (Secret scanner named after our favorite detective, writen in sandie-*Go*) is a **set of tools and scripts** that aims to provide you with a continuous application security posture management toolset based on a **constantly generated**, **lightweight**, **quickly actionable** set of vulnerability reports, saved onto a file you can process after the scanning is done.
+`carmensandiego` (Secret scanner named after our favorite detective, writen in sandie-*Go*) is a **set of tools and scripts** that aims to provide you with a continuous application security posture management toolset based on a **maintained**, **lightweight**, **quickly actionable** set of secret matching patterns, that returns the information you need: what did you accidentally put on your repo that you should remove.
 
 # Why do we need this?
 Secret scanning is an essential part of the application security management task list, and that requires a proper toolset. There are open tools that provide this out there like `Trivy`, or repositories with large datasets of [secret pattern patching rules](https://github.com/mazen160/secrets-patterns-db), but these are either hard to scale in a considerable codebase, or need a large amount of work to manage.
 
 # Why create this tool if Trivy exists?
-Trivy is very good at its job of investigating commited secrets in a repository against a set of standards, like SSH keys or authentication tokens, we can target and clear. That said, Trivy is designed to be launched manually, is not optimized for larger codebases, and its results checked in terminal interfaces. It's really useful to have a security scanner that we can run to check for secrets in bulk, but a 500 line `json` pasted in an ephimeral terminal after is not the **human-centric** way of working. This is where `carmensandiego` comes in.
+Trivy is very good at its job of investigating commited secrets in a repository against a set of standards, like SSH keys or authentication tokens, we can target and clear. That said, Trivy is designed to be launched manually, is not optimized for larger codebases. It's really useful to have a security scanner that we can run to check for secrets in bulk, but a 500 line `json` pasted in an ephimeral terminal after is not the **human-centric** way of working. This is where `carmensandiego` comes in.
 
 # What does atomic-threat-hunter bring to the table?
 The aim of this tool is to bring in the human-centric part we miss from other tool sources, like `Trivy` or `secrets-patterns-db:`:
@@ -30,4 +30,4 @@ docker run --rm \
 ```
 
 # Where can I send the detected findings?
-The standard format provided by `carmensandiego` can be sent to anything that then supports the data processing a standard `json` file.
+For now, `carmensandiego` doesn't support any integrations, it's for pure user-interaction only. That might change in the future 👀
