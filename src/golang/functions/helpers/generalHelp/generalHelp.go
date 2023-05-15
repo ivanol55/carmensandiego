@@ -9,6 +9,6 @@ import (
 // Declares a function that prints the general system help
 func ShowHelp() {
 	fmt.Println("This tool offers several scanning options depending on your secret scanning needs. Here's what's available as first-level options (more features in development!):")
-	fmt.Println("    - 'secrets' will let you scan and generate reports on your specified folder structure on your profile. run this script with 'scan' or 'scan help' to get more information")
+	fmt.Println("    - 'secrets' will let you scan and generate reports on your specified folder structure on your profile. run this script with just 'scan' to get more information")
 	fmt.Println("")
 }
